@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TalentHub</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { -webkit-font-smoothing: antialiased; }
+  body { font-family: Inter, sans-serif; background: #000; color: #fff; font-weight: 300; font-size: 14px; letter-spacing: 0.01em; }
+  .fs { font-family: 'Cormorant Garamond', serif; font-weight: 300; letter-spacing: -0.02em; }
+  .fsi { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; letter-spacing: -0.02em; }
+  .fsl { font-family: 'Cormorant Garamond', serif; font-weight: 300; }
+  .mono { font-family: 'SF Mono', Monaco, monospace; font-size: 10px; letter-spacing: 0.15em; }
+
+  .card { border: 1px solid rgba(255,255,255,0.06); overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255,255,255,0.015); }
+  .card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); }
+  .card img { filter: grayscale(100%) contrast(1.1); transition: filter 0.6s; }
+  .card:hover img { filter: grayscale(0%) contrast(1); }
+
+  .ir { transition: all 0.4s; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .ir:hover { background: rgba(255,255,255,0.02); padding-left: 1rem; }
+  .ir:last-child { border-bottom: none; }
+
+  .sb { transition: all 0.2s; cursor: pointer; }
+  .sb.st path { fill: #fff; stroke: #fff; }
+  .sb:not(.st) path { fill: none; stroke: rgba(255,255,255,0.5); }
+  .sb:hover { transform: scale(1.1); }
+  .sb:hover path { stroke: #fff; }
+
+  .ei { background: transparent; border: none; outline: none; width: 100%; color: #fff; font: inherit; }
+  .ei:focus { background: rgba(255,255,255,0.04); padding: 2px 6px; margin: -2px -6px; border-radius: 2px; }
+
+  .et { background: transparent; border: 1px solid transparent; outline: none; width: 100%; color: rgba(255,255,255,0.85); font: inherit; resize: none; padding: 4px 8px; border-radius: 2px; }
+  .et:hover { border-color: rgba(255,255,255,0.08); }
+  .et:focus { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.03); }
+
+  .ip { background: transparent; border: 1px solid rgba(255,255,255,0.15); padding: 4px 8px; color: #fff; font-size: 14px; width: 40px; text-align: center; letter-spacing: 0.1em; }
+  .ip:focus { border-color: rgba(255,255,255,0.4); }
+
+  .btn { border: 1px solid rgba(255,255,255,0.15); padding: 10px 20px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; transition: all 0.3s; color: rgba(255,255,255,0.7); background: transparent; }
+  .btn:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.03); }
+  .btn-primary:hover { background: #fff; color: #000; }
+  .btn-danger:hover { border-color: rgba(239,68,68,0.5); color: rgb(239,68,68); background: transparent; }
+  .btn-ghost { border: 1px dashed rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+  .btn-ghost:hover { border-style: solid; border-color: rgba(255,255,255,0.3); color: #fff; }
+
+  .fi { animation: fi 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes fi { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .pd { animation: pd 2.5s infinite; }
+  @keyframes pd { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  .link { color: rgba(255,255,255,0.5); transition: color 0.2s; position: relative; }
+  .link:hover { color: #fff; }
+  .link-u { border-bottom: 1px solid currentColor; }
+
+  .section { border: 1px solid rgba(255,255,255,0.08); padding: 28px; }
+  .section-muted { background: rgba(255,255,255,0.015); }
+
+  .pill { padding: 6px 14px; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.12); transition: all 0.2s; cursor: pointer; }
+  .pill:hover { border-color: rgba(255,255,255,0.3); }
+  .pill.active { background: #fff; color: #000; border-color: #fff; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #000; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .lu { position: relative; }
+  .lu::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 1px; background: currentColor; transition: width 0.3s; }
+  .lu:hover::after { width: 100%; }
+
+  .dot-sep::before { content: '·'; margin: 0 8px; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<nav class="sticky top-0 z-50 border-b border-white/8 bg-black/90 backdrop-blur-xl">
+  <div class="max-w-7xl mx-auto flex justify-between items-center px-8 py-6">
+    <a href="#" onclick="go('home');return false" class="fsl text-lg tracking-wide">TalentHub</a>
+    <div id="nav" class="hidden md:flex gap-6 mono"></div>
+    <div class="flex items-center gap-4">
+      <div class="hidden md:flex items-center gap-2 mono text-white/40">
+        <span class="pd h-1 w-1 rounded-full bg-white"></span>
+        <span id="us">Auto-sync</span>
+      </div>
+      <div class="relative">
+        <input id="search" placeholder="Search" oninput="doSearch()" class="bg-transparent border-b border-white/15 pl-5 pr-2 py-1 text-xs w-28 focus:outline-none focus:border-white/60 placeholder:text-white/30 font-light">
+        <svg class="absolute left-0 top-1.5 h-3 w-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg>
+        <div id="searchResults" class="hidden absolute top-10 right-0 w-72 border border-white/10 bg-black z-50 max-h-96 overflow-y-auto"></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main id="app"></main>
+<div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 hidden bg-white text-black px-5 py-3 mono font-medium"></div>
+
+<footer class="border-t border-white/8 mt-32">
+  <div class="max-w-7xl mx-auto px-8 py-10 flex justify-between items-center mono text-white/30">
+    <div>© MMXXV · TalentHub</div>
+    <div id="ls">Last sync —</div>
+  </div>
+</footer>
+
+<script>
+const DI = {
+  HR: { label: 'Human Resources', desc: 'HR executives and AI HR platform leaders', num: '01', icon: 'I' },
+  VOICE_AI: { label: 'Voice AI', desc: 'Speech synthesis and audio intelligence', num: '02', icon: 'II' },
+  AI_AGENTS: { label: 'AI Agents', desc: 'Agent frameworks, research, and platforms', num: '03', icon: 'III' },
+  VC: { label: 'Venture Capital', desc: 'Investors backing AI-native companies', num: '04', icon: 'IV' },
+  UNIVERSITY: { label: 'Academia', desc: 'AI researchers and university faculty', num: '05', icon: 'V' }
+};
+
+const DC = {
+  universal: [
+    'Must hold a senior leadership, founder, or principal researcher role',
+    'Must have a verifiable public presence across LinkedIn, X, or published work',
+    'Must have been professionally active within the last twelve months',
+    'Must have publicly accessible education and career history'
+  ],
+  byIndustry: {
+    HR: ['Senior HR executive at Fortune 1000 company', 'Founder or C-level at HR tech or AI HR company with $5M+ funding', 'Widely cited HR industry analyst with published research'],
+    VOICE_AI: ['Founder or C-level at voice AI or speech technology company', 'Company must have raised $3M+ or serve 10,000+ active users', 'Principal research scientist at a major voice AI laboratory'],
+    AI_AGENTS: ['Founder or leadership at an AI agent framework or platform', 'Senior PM or research lead at a major AI laboratory', 'Influential open-source contributor with 5,000+ GitHub stars'],
+    VC: ['General Partner or solo capitalist actively investing in AI', 'Led or participated in five or more AI deals in the last two years', 'Managing a $50M+ fund focused on AI-native companies'],
+    UNIVERSITY: ['Tenured or tenure-track professor at a top-50 research university', 'Focus on AI, ML, NLP, or Robotics research', 'Leads a recognized AI research laboratory', 'Minimum 1,000+ Google Scholar citations']
+  }
+};
+
+const P = [
+  { slug: 'josh-bersin', name: 'Josh Bersin', title: 'Global Industry Analyst', company: 'The Josh Bersin Company', industry: 'HR',
+    bio: 'Globally recognized HR industry analyst. Founder of Bersin & Associates (acquired by Deloitte) and The Josh Bersin Company.',
+    linkedin: 'https://www.linkedin.com/in/bersin/', twitter: 'https://x.com/Josh_Bersin',
+    education: [{ school: 'Stanford University', degree: 'MS, Engineering Management' }, { school: 'Cornell University', degree: 'BS, Engineering' }],
+    experience: [{ role: 'Founder & CEO', company: 'The Josh Bersin Company', current: true }, { role: 'Principal, Bersin', company: 'Deloitte Consulting' }] },
+  { slug: 'ashutosh-garg', name: 'Ashutosh Garg', title: 'Co-Founder & CEO', company: 'Eightfold AI', industry: 'HR',
+    bio: 'Co-founder and CEO of Eightfold AI, a talent intelligence platform using deep learning.',
+    linkedin: 'https://www.linkedin.com/in/ashutoshgarg-eightfold/',
+    education: [{ school: 'University of Illinois Urbana-Champaign', degree: 'PhD, Computer Science' }, { school: 'IIT Delhi', degree: 'B.Tech, Computer Science' }],
+    experience: [{ role: 'Co-Founder & CEO', company: 'Eightfold AI', current: true }, { role: 'Research Scientist', company: 'Google' }] },
+  { slug: 'harrison-chase', name: 'Harrison Chase', title: 'Co-Founder & CEO', company: 'LangChain', industry: 'AI_AGENTS',
+    bio: 'Co-founder and CEO of LangChain, the open-source framework for building applications with large language models.',
+    linkedin: 'https://www.linkedin.com/in/harrison-chase-961287118/', twitter: 'https://x.com/hwchase17',
+    education: [{ school: 'Harvard University', degree: 'BA, Statistics & Computer Science' }],
+    experience: [{ role: 'Co-Founder & CEO', company: 'LangChain', current: true }, { role: 'ML Engineer', company: 'Robust Intelligence' }] },
+  { slug: 'andrew-ng', name: 'Andrew Ng', title: 'Founder', company: 'DeepLearning.AI', industry: 'AI_AGENTS',
+    bio: 'Founder of DeepLearning.AI, Landing AI, and AI Fund. Co-founder of Coursera. Adjunct Professor at Stanford.',
+    linkedin: 'https://www.linkedin.com/in/andrewyng/', twitter: 'https://x.com/AndrewYNg',
+    education: [{ school: 'UC Berkeley', degree: 'PhD, Computer Science' }, { school: 'MIT', degree: 'MS, EECS' }, { school: 'Carnegie Mellon', degree: 'BS' }],
+    experience: [{ role: 'Founder', company: 'DeepLearning.AI', current: true }, { role: 'Founder & CEO', company: 'Landing AI', current: true }] },
+  { slug: 'scott-stephenson', name: 'Scott Stephenson', title: 'Co-Founder & CEO', company: 'Deepgram', industry: 'VOICE_AI',
+    bio: 'Co-founder and CEO of Deepgram, a leading speech-to-text and voice AI platform. Former particle physicist.',
+    linkedin: 'https://www.linkedin.com/in/scottstephenson/', twitter: 'https://x.com/ScottSteph',
+    education: [{ school: 'University of Michigan', degree: 'PhD, Particle Physics' }, { school: 'Case Western Reserve', degree: 'BS, Physics' }],
+    experience: [{ role: 'Co-Founder & CEO', company: 'Deepgram', current: true }] },
+  { slug: 'mati-staniszewski', name: 'Mati Staniszewski', title: 'Co-Founder & CEO', company: 'ElevenLabs', industry: 'VOICE_AI',
+    bio: 'Co-founder and CEO of ElevenLabs, a leader in AI voice synthesis and cloning.',
+    linkedin: 'https://www.linkedin.com/in/mati-staniszewski/', twitter: 'https://x.com/matistanis',
+    education: [{ school: 'Imperial College London', degree: 'Mathematics' }],
+    experience: [{ role: 'Co-Founder & CEO', company: 'ElevenLabs', current: true }, { role: 'Deployment Strategist', company: 'Palantir' }] },
+  { slug: 'sarah-guo', name: 'Sarah Guo', title: 'Founder & Managing Partner', company: 'Conviction', industry: 'VC',
+    bio: 'Founder of Conviction, AI-focused venture fund. Host of No Priors podcast. Previously General Partner at Greylock.',
+    linkedin: 'https://www.linkedin.com/in/sarahguo/', twitter: 'https://x.com/saranormous',
+    education: [{ school: 'University of Pennsylvania', degree: 'BS, Wharton & Engineering' }],
+    experience: [{ role: 'Founder & Managing Partner', company: 'Conviction', current: true }, { role: 'General Partner', company: 'Greylock Partners' }] },
+  { slug: 'vinod-khosla', name: 'Vinod Khosla', title: 'Founder', company: 'Khosla Ventures', industry: 'VC',
+    bio: 'Founder of Khosla Ventures. Co-founder of Sun Microsystems. Early major backer of OpenAI.',
+    linkedin: 'https://www.linkedin.com/in/vinodkhosla/', twitter: 'https://x.com/vkhosla',
+    education: [{ school: 'Stanford GSB', degree: 'MBA' }, { school: 'IIT Delhi', degree: 'B.Tech' }],
+    experience: [{ role: 'Founder', company: 'Khosla Ventures', current: true }, { role: 'Co-Founder', company: 'Sun Microsystems' }] },
+  { slug: 'fei-fei-li', name: 'Fei-Fei Li', title: 'Sequoia Professor', company: 'Stanford University', industry: 'UNIVERSITY',
+    bio: 'Sequoia Professor at Stanford and Co-Director of Stanford HAI. Creator of ImageNet. Co-founder of World Labs.',
+    linkedin: 'https://www.linkedin.com/in/fei-fei-li-4541247/', twitter: 'https://x.com/drfeifei',
+    education: [{ school: 'Caltech', degree: 'PhD, Electrical Engineering' }, { school: 'Princeton University', degree: 'BA, Physics' }],
+    experience: [{ role: 'Sequoia Professor', company: 'Stanford University', current: true }, { role: 'Co-Founder & CEO', company: 'World Labs', current: true }] },
+  { slug: 'yann-lecun', name: 'Yann LeCun', title: 'Chief AI Scientist', company: 'Meta · NYU', industry: 'UNIVERSITY',
+    bio: 'Chief AI Scientist at Meta and Silver Professor at NYU. 2018 Turing Award laureate. Inventor of convolutional neural networks.',
+    linkedin: 'https://www.linkedin.com/in/yann-lecun/', twitter: 'https://x.com/ylecun',
+    education: [{ school: 'Sorbonne Université', degree: 'PhD, Computer Science' }],
+    experience: [{ role: 'Chief AI Scientist', company: 'Meta', current: true }, { role: 'Silver Professor', company: 'NYU', current: true }] }
+];
+
+// STORAGE
+function getIND() { try { const s = localStorage.getItem('ind'); if (s) return JSON.parse(s); } catch(e){} return JSON.parse(JSON.stringify(DI)); }
+function saveIND(i) { localStorage.setItem('ind', JSON.stringify(i)); }
+function getCR() { try { const s = localStorage.getItem('cr'); if (s) return JSON.parse(s); } catch(e){} return JSON.parse(JSON.stringify(DC)); }
+function saveCR(c) { localStorage.setItem('cr', JSON.stringify(c)); }
+function getStars() { try { return JSON.parse(localStorage.getItem('stars') || '[]'); } catch(e) { return []; } }
+function saveStars(a) { localStorage.setItem('stars', JSON.stringify(a)); updateHub(); }
+function isStar(s) { return getStars().includes(s); }
+function toggleStar(slug, e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  const a = getStars();
+  const i = a.indexOf(slug);
+  if (i !== -1) { a.splice(i, 1); toast('Removed from hub'); }
+  else { a.push(slug); toast('Added to hub'); }
+  saveStars(a);
+  if (window.cv) window.cv();
+}
+function updateHub() { const e = document.getElementById('hubCount'); if (e) e.textContent = '(' + getStars().length + ')'; }
+function getNotes() { try { return JSON.parse(localStorage.getItem('notes') || '{}'); } catch(e) { return {}; } }
+function saveNote(s, n) { const o = getNotes(); if (n) o[s] = n; else delete o[s]; localStorage.setItem('notes', JSON.stringify(o)); }
+
+// HELPERS
+function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function av(n) { return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(n) + '&size=400&background=1a1a1a&color=ffffff&font-size=0.28&bold=false'; }
+function toast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.classList.remove('hidden');
+  clearTimeout(window._t);
+  window._t = setTimeout(() => t.classList.add('hidden'), 2000);
+}
+function autoGrow(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+
+function updateSync() {
+  const l = localStorage.getItem('lastSync');
+  const el = document.getElementById('ls');
+  if (!el) return;
+  if (l) {
+    const d = Math.floor((Date.now() - parseInt(l)) / 60000);
+    el.textContent = 'Last sync — ' + (d < 1 ? 'just now' : d + 'm ago');
+  } else {
+    localStorage.setItem('lastSync', Date.now().toString());
+    el.textContent = 'Last sync — just now';
+  }
+}
+setInterval(updateSync, 30000);
+
+function refresh() {
+  const s = document.getElementById('us');
+  if (s) s.textContent = 'Syncing';
+  setTimeout(() => {
+    localStorage.setItem('lastSync', Date.now().toString());
+    if (s) s.textContent = 'Auto-sync';
+    updateSync();
+    toast('Data refreshed');
+  }, 1200);
+}
+
+// NAV (changed "Hub" to "My Hub")
+function renderNav() {
+  const ind = getIND();
+  let h = '';
+  Object.keys(ind).forEach(k => {
+    h += `<a href="#" onclick="go('ind','${k}');return false" class="link lu">${esc(ind[k].label)}</a>`;
+  });
+  h += `<a href="#" onclick="go('crit');return false" class="link lu">Criteria</a>`;
+  h += `<a href="#" onclick="go('hub');return false" class="link lu text-white">My Hub <span id="hubCount" class="text-white/40">(0)</span></a>`;
+  document.getElementById('nav').innerHTML = h;
+  updateHub();
+}
+
+// CARD
+function pCard(p) {
+  const st = isStar(p.slug);
+  return `<div class="card relative">
+    <button onclick="toggleStar('${p.slug}',event)" class="sb ${st ? 'st' : ''} absolute top-3 right-3 z-10 p-1.5">
+      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 .587l3.668 7.568L24 9.75l-6 5.847L19.336 24 12 19.897 4.664 24 6 15.597 0 9.75l8.332-1.595z"/></svg>
+    </button>
+    <a href="#" onclick="go('person','${p.slug}');return false" class="block">
+      <div class="aspect-[3/4] overflow-hidden bg-white/5"><img src="${av(p.name)}" class="w-full h-full object-cover"></div>
+      <div class="p-4 border-t border-white/8">
+        <div class="text-sm fsl leading-tight">${esc(p.name)}</div>
+        <div class="mt-1 mono text-white/40">${esc(p.company)}</div>
+      </div>
+    </a>
+  </div>`;
+}
+
+// HOME (tightened padding, original slogan restored)
+function renderHome() {
+  window.cv = renderHome;
+  const ind = getIND();
+  const rows = Object.keys(ind).map(k => {
+    const o = ind[k];
+    const c = P.filter(p => p.industry === k).length;
+    return `<a href="#" onclick="go('ind','${k}');return false" class="ir group block py-8 px-6">
+      <div class="flex items-baseline justify-between gap-8">
+        <div class="flex items-baseline gap-8 md:gap-12 min-w-0 flex-1">
+          <span class="mono text-white/30 w-8">${esc(o.num)}</span>
+          <div class="min-w-0 flex-1">
+            <div class="fs text-3xl md:text-5xl leading-none">${esc(o.label)}</div>
+            <div class="mt-2 text-xs text-white/40 font-light">${esc(o.desc)}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-6 flex-shrink-0">
+          <span class="mono text-white/30">${String(c).padStart(2, '0')} profiles</span>
+          <span class="text-white/30 group-hover:text-white transition">→</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="fi">
+      <section class="max-w-7xl mx-auto px-8 pt-16 md:pt-20 pb-24">
+        <div class="flex items-center justify-between mb-12">
+          <div class="mono text-white/40">An Index of AI Leadership</div>
+          <button onclick="refresh()" class="btn btn-primary flex items-center gap-2">
+            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <h1 class="fs text-6xl md:text-8xl lg:text-9xl leading-[0.95]">
+          The world's<br>
+          <span class="fsi text-white/70">top minds.</span><br>
+          All in one place.
+        </h1>
+
+        <div class="mt-16 max-w-2xl">
+          <p class="text-sm text-white/50 leading-relaxed font-light">
+            A curated directory of leaders across Human Resources, Voice AI, AI Agents, Venture Capital, and Academia — with verified credentials, live news, and continuous updates.
+          </p>
+        </div>
+      </section>
+
+      <section class="max-w-7xl mx-auto px-8 pb-40">
+        <div class="flex items-baseline justify-between mb-10 px-6">
+          <div class="mono text-white/40">Index</div>
+          <div class="mono text-white/30">${P.length} profiles · ${Object.keys(ind).length} categories</div>
+        </div>
+        <div class="border-t border-white/8">${rows}</div>
+      </section>
+    </div>`;
+}
+
+// CRITERIA
+function renderCriteria() {
+  window.cv = renderCriteria;
+  const ind = getIND();
+  const cr = getCR();
+
+  const uni = cr.universal.map((x, i) => `
+    <li class="py-3 border-t border-white/8 first:border-t-0 flex items-start gap-4">
+      <span class="mono text-white/40 mt-1.5 w-6">${String(i + 1).padStart(2, '0')}</span>
+      <textarea class="et flex-1 text-sm font-light leading-relaxed" rows="1" oninput="updateUni(${i},this.value);autoGrow(this)" onfocus="autoGrow(this)">${esc(x)}</textarea>
+      <button onclick="removeUni(${i})" class="text-white/20 hover:text-white text-sm px-2 flex-shrink-0 transition">×</button>
+    </li>`).join('');
+
+  const secs = Object.keys(ind).map(k => {
+    const o = ind[k];
+    const items = (cr.byIndustry[k] || []).map((x, i) => `
+      <li class="py-3 border-t border-white/8 first:border-t-0 flex items-start gap-4">
+        <span class="mono text-white/40 mt-1.5 w-6">${String(i + 1).padStart(2, '0')}</span>
+        <textarea class="et flex-1 text-sm font-light leading-relaxed" rows="1" oninput="updateIC('${k}',${i},this.value);autoGrow(this)" onfocus="autoGrow(this)">${esc(x)}</textarea>
+        <button onclick="removeIC('${k}',${i})" class="text-white/20 hover:text-white text-sm px-2 flex-shrink-0 transition">×</button>
+      </li>`).join('');
+
+    return `<div class="section section-muted">
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <div class="flex items-baseline gap-4 flex-1 min-w-0">
+          <span class="mono text-white/40 flex-shrink-0 w-8">${esc(o.num)}</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-1">
+              <input class="ip mono" value="${esc(o.icon || '')}" onblur="updateInd('${k}','icon',this.value)" maxlength="4" placeholder="—">
+              <input class="ei fs text-2xl" value="${esc(o.label)}" onblur="updateInd('${k}','label',this.value)">
+            </div>
+            <input class="ei text-xs text-white/50 font-light" value="${esc(o.desc)}" onblur="updateInd('${k}','desc',this.value)">
+          </div>
+        </div>
+        <button onclick="deleteInd('${k}')" class="btn btn-danger flex-shrink-0">Delete</button>
+      </div>
+      <ul class="text-sm">${items || '<li class="text-white/30 py-3 text-xs italic">No criteria defined.</li>'}</ul>
+      <button onclick="addIC('${k}')" class="btn btn-ghost mt-4">+ Add criterion</button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="fi">
+      <section class="border-b border-white/8">
+        <div class="max-w-4xl mx-auto px-8 pt-12 pb-14">
+          <button onclick="go('home')" class="mono text-white/40 hover:text-white mb-10 transition">← Back to Index</button>
+          <h1 class="fs text-5xl md:text-7xl leading-tight mb-6">Inclusion<br><span class="fsi text-white/70">Criteria</span></h1>
+          <p class="text-sm text-white/50 max-w-xl leading-relaxed font-light">Edit criteria below. Changes save automatically and define who qualifies for inclusion in the index.</p>
+          <div class="mt-8 flex items-center gap-3 mono text-white/40">
+            <span class="pd h-1 w-1 rounded-full bg-white"></span>Auto-saving
+          </div>
+        </div>
+      </section>
+
+      <section class="max-w-4xl mx-auto px-8 py-16 space-y-8">
+        <div class="section section-muted">
+          <div class="mono text-white/40 mb-3">Universal Requirements</div>
+          <h2 class="fs text-3xl mb-6">Required of all profiles</h2>
+          <ul class="text-sm">${uni}</ul>
+          <button onclick="addUni()" class="btn btn-ghost mt-4">+ Add universal criterion</button>
+        </div>
+
+        <div class="flex items-center justify-between mt-16 mb-2">
+          <div class="mono text-white/40">Industry Criteria</div>
+          <button onclick="addInd()" class="btn btn-primary">+ New Industry</button>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2">${secs}</div>
+
+        <div class="section section-muted flex flex-wrap items-center justify-between gap-6 mt-16">
+          <div>
+            <div class="mono text-white/40 mb-2">System</div>
+            <div class="fs text-xl">Restore Defaults</div>
+            <div class="text-xs text-white/40 font-light mt-1">Reset all industries and criteria to factory settings.</div>
+          </div>
+          <button onclick="resetAll()" class="btn btn-danger">Reset All</button>
+        </div>
+      </section>
+    </div>`;
+
+  setTimeout(() => document.querySelectorAll('.et').forEach(autoGrow), 10);
+}
+
+function updateUni(i, v) { const c = getCR(); c.universal[i] = v; saveCR(c); }
+function addUni() { const c = getCR(); c.universal.push('New requirement — click to edit'); saveCR(c); renderCriteria(); toast('Added'); }
+function removeUni(i) { const c = getCR(); c.universal.splice(i, 1); saveCR(c); renderCriteria(); toast('Removed'); }
+function updateIC(k, i, v) { const c = getCR(); if (!c.byIndustry[k]) c.byIndustry[k] = []; c.byIndustry[k][i] = v; saveCR(c); }
+function addIC(k) { const c = getCR(); if (!c.byIndustry[k]) c.byIndustry[k] = []; c.byIndustry[k].push('New criterion — click to edit'); saveCR(c); renderCriteria(); toast('Added'); }
+function removeIC(k, i) { const c = getCR(); c.byIndustry[k].splice(i, 1); saveCR(c); renderCriteria(); toast('Removed'); }
+function updateInd(k, f, v) { const ind = getIND(); if (!ind[k]) return; ind[k][f] = v; saveIND(ind); renderNav(); toast('Saved'); }
+
+function addInd() {
+  const label = prompt('Industry name:');
+  if (!label || !label.trim()) return;
+  const ind = getIND();
+  const c = getCR();
+  let key = label.toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '');
+  let n = 1;
+  const orig = key;
+  while (ind[key]) { key = orig + '_' + n; n++; }
+  let mx = 0;
+  Object.keys(ind).forEach(kk => { const p = parseInt(ind[kk].num); if (!isNaN(p) && p > mx) mx = p; });
+  ind[key] = { label: label.trim(), desc: 'Description — click to edit', num: String(mx + 1).padStart(2, '0'), icon: '' };
+  c.byIndustry[key] = ['Define criterion — click to edit'];
+  saveIND(ind); saveCR(c); renderNav(); renderCriteria();
+  toast('Industry added');
+}
+
+function deleteInd(k) {
+  const ind = getIND();
+  if (!ind[k]) return;
+  if (!confirm('Delete "' + ind[k].label + '"?')) return;
+  delete ind[k];
+  const c = getCR();
+  delete c.byIndustry[k];
+  saveIND(ind); saveCR(c); renderNav(); renderCriteria();
+  toast('Deleted');
+}
+
+function resetAll() {
+  if (!confirm('Reset everything to defaults?')) return;
+  saveIND(JSON.parse(JSON.stringify(DI)));
+  saveCR(JSON.parse(JSON.stringify(DC)));
+  renderNav(); renderCriteria();
+  toast('Reset complete');
+}
+
+// INDUSTRY
+function renderIndustry(k) {
+  window.cv = () => renderIndustry(k);
+  const ind = getIND();
+  const o = ind[k];
+  if (!o) { document.getElementById('app').innerHTML = '<p class="p-8 text-white/40">Not found</p>'; return; }
+  const pe = P.filter(p => p.industry === k).sort((a, b) => a.name.localeCompare(b.name));
+
+  document.getElementById('app').innerHTML = `
+    <div class="fi">
+      <section class="border-b border-white/8">
+        <div class="max-w-7xl mx-auto px-8 pt-12 pb-14">
+          <button onclick="go('home')" class="mono text-white/40 hover:text-white mb-10 transition">← Back to Index</button>
+          <div class="flex items-baseline gap-8">
+            <span class="mono text-white/30 w-8">${esc(o.num)}</span>
+            <div>
+              <h1 class="fs text-5xl md:text-7xl leading-none">${esc(o.label)}</h1>
+              <p class="mt-4 text-sm text-white/50 max-w-xl font-light leading-relaxed">${esc(o.desc)}</p>
+              <p class="mt-6 mono text-white/40">${String(pe.length).padStart(2,'0')} profiles <span class="dot-sep"></span> <a href="#" onclick="go('crit');return false" class="link link-u">View criteria</a></p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="max-w-7xl mx-auto px-8 py-16">
+        ${pe.length === 0
+          ? '<div class="text-center py-20 text-white/30 text-sm font-light">No profiles in this industry yet.</div>'
+          : `<div class="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">${pe.map(pCard).join('')}</div>`}
+      </section>
+    </div>`;
+}
+
+// PROFILE
+function renderPerson(slug) {
+  window.cv = () => renderPerson(slug);
+  const p = P.find(x => x.slug === slug);
+  if (!p) { document.getElementById('app').innerHTML = '<p class="p-8 text-white/40">Not found</p>'; return; }
+  const ind = getIND();
+  const o = ind[p.industry] || { label: 'Unknown', num: '—' };
+  const nu = 'https://news.google.com/search?q=' + encodeURIComponent('"' + p.name + '" ' + p.company);
+  const st = isStar(p.slug);
+  const note = getNotes()[p.slug] || '';
+
+  let soc = '';
+  if (p.linkedin) soc += `<a href="${p.linkedin}" target="_blank" class="btn">LinkedIn</a>`;
+  if (p.twitter) soc += `<a href="${p.twitter}" target="_blank" class="btn">X</a>`;
+
+  const ed = p.education.map(e => `<div class="py-3 border-t border-white/8 first:border-t-0"><div class="text-sm fsl">${esc(e.school)}</div><div class="mt-1 text-xs text-white/40 font-light">${esc(e.degree)}</div></div>`).join('');
+  const ex = p.experience.map(e => `<div class="py-3 border-t border-white/8 first:border-t-0"><div class="text-sm fsl">${esc(e.role)}</div><div class="mt-1 text-xs text-white/40 font-light">${esc(e.company)}${e.current ? ' <span class="mono text-white/60">— Current</span>' : ''}</div></div>`).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="fi">
+      <section class="border-b border-white/8">
+        <div class="max-w-4xl mx-auto px-8 pt-12 pb-14">
+          <button onclick="go('ind','${p.industry}')" class="mono text-white/40 hover:text-white mb-10 transition">← ${esc(o.label)}</button>
+          <div class="flex gap-8 items-start">
+            <div class="h-28 w-28 md:h-32 md:w-32 flex-shrink-0 overflow-hidden border border-white/10 bg-white/5">
+              <img src="${av(p.name)}" class="w-full h-full object-cover" style="filter:grayscale(100%)">
+            </div>
+            <div class="flex-1 min-w-0 pt-2">
+              <div class="mono text-white/40 mb-3">${esc(o.num)} <span class="dot-sep"></span> ${esc(o.label)}</div>
+              <h1 class="fs text-4xl md:text-5xl leading-none">${esc(p.name)}</h1>
+              <p class="mt-4 text-sm text-white/70 fsl">${esc(p.title)}</p>
+              <p class="text-xs text-white/40 mt-1 font-light">${esc(p.company)}</p>
+              <div class="mt-6 flex gap-2 items-center flex-wrap">
+                ${soc}
+                <button onclick="toggleStar('${p.slug}')" class="btn sb ${st ? 'st' : ''} flex items-center gap-2">
+                  <svg class="h-3 w-3" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 .587l3.668 7.568L24 9.75l-6 5.847L19.336 24 12 19.897 4.664 24 6 15.597 0 9.75l8.332-1.595z"/></svg>
+                  ${st ? 'Pinned' : 'Pin'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="max-w-4xl mx-auto px-8 py-16 space-y-6">
+        <div class="section section-muted">
+          <div class="mono text-white/40 mb-4">Biography</div>
+          <p class="fs text-2xl md:text-3xl leading-tight text-white/90 font-light">${esc(p.bio)}</p>
+        </div>
+
+        <div class="section section-muted">
+          <div class="mono text-white/40 mb-4">Private Notes</div>
+          <textarea oninput="saveNote('${p.slug}',this.value)" placeholder="Add private notes — stored locally in your browser..." class="w-full bg-transparent border border-white/10 p-4 text-sm font-light text-white/85 placeholder:text-white/25 focus:outline-none focus:border-white/30 resize-none transition" rows="3">${esc(note)}</textarea>
+        </div>
+
+        <div class="section section-muted">
+          <div class="flex items-start justify-between mb-4 gap-4 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 mb-2 mono text-white/40">
+                <span class="pd h-1 w-1 rounded-full bg-white"></span>Live Feed
+              </div>
+              <h2 class="fs text-2xl md:text-3xl">Latest News</h2>
+            </div>
+            <span class="mono text-white/30">Updated continuously</span>
+          </div>
+          <p class="text-xs text-white/50 mb-6 max-w-lg font-light leading-relaxed">Real-time news about ${esc(p.name)}, sourced from Google News.</p>
+          <a href="${nu}" target="_blank" class="btn btn-primary inline-flex items-center gap-3">View Live News →</a>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="section section-muted">
+            <div class="mono text-white/40 mb-4">Education</div>
+            <div>${ed}</div>
+          </div>
+          <div class="section section-muted">
+            <div class="mono text-white/40 mb-4">Experience</div>
+            <div>${ex}</div>
+          </div>
+        </div>
+      </section>
+    </div>`;
+}
+
+// HUB
+function renderHub() {
+  window.cv = renderHub;
+  const stars = getStars();
+  const sp = P.filter(p => stars.includes(p.slug));
+  const cards = sp.map(pCard).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="fi">
+      <section class="border-b border-white/8">
+        <div class="max-w-7xl mx-auto px-8 pt-12 pb-14">
+          <button onclick="go('home')" class="mono text-white/40 hover:text-white mb-10 transition">← Back to Index</button>
+          <h1 class="fs text-5xl md:text-7xl leading-none">My Hub</h1>
+          <p class="mt-6 mono text-white/40">${String(sp.length).padStart(2, '0')} pinned profiles</p>
+        </div>
+      </section>
+      <section class="max-w-7xl mx-auto px-8 py-16">
+        ${sp.length === 0
+          ? `<div class="text-center py-24">
+              <div class="fs text-4xl mb-4 text-white/60">Your hub is empty</div>
+              <p class="text-sm text-white/40 max-w-md mx-auto font-light leading-relaxed">Pin profiles to build your personal collection. Click the star icon on any profile to add it here.</p>
+              <button onclick="go('home')" class="btn btn-primary mt-8">Browse profiles →</button>
+            </div>`
+          : `<div class="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">${cards}</div>`}
+      </section>
+    </div>`;
+}
+
+// SEARCH
+function doSearch() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const r = document.getElementById('searchResults');
+  if (!q) { r.classList.add('hidden'); return; }
+  const m = P.filter(p => p.name.toLowerCase().includes(q) || p.company.toLowerCase().includes(q) || p.title.toLowerCase().includes(q)).slice(0, 6);
+  if (m.length === 0) {
+    r.innerHTML = '<div class="p-4 mono text-white/40">No results</div>';
+  } else {
+    r.innerHTML = m.map(p => `<a href="#" onclick="go('person','${p.slug}');document.getElementById('search').value='';document.getElementById('searchResults').classList.add('hidden');return false" class="flex items-center gap-3 p-3 hover:bg-white/5 border-b border-white/5 last:border-0 transition">
+      <img src="${av(p.name)}" class="h-10 w-10" style="filter:grayscale(100%)">
+      <div class="flex-1 min-w-0">
+        <div class="text-sm fsl truncate">${esc(p.name)}</div>
+        <div class="mono text-white/40 truncate">${esc(p.company)}</div>
+      </div>
+    </a>`).join('');
+  }
+  r.classList.remove('hidden');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#search') && !e.target.closest('#searchResults')) {
+    const r = document.getElementById('searchResults');
+    if (r) r.classList.add('hidden');
+  }
+});
+
+// ROUTER
+function go(v, a) {
+  if (v === 'home') renderHome();
+  if (v === 'crit') renderCriteria();
+  if (v === 'ind') renderIndustry(a);
+  if (v === 'person') renderPerson(a);
+  if (v === 'hub') renderHub();
+  window.scrollTo(0, 0);
+}
+
+// AUTO-SYNC
+setInterval(() => {
+  const l = parseInt(localStorage.getItem('lastSync') || '0');
+  if (Date.now() - l > 600000) {
+    localStorage.setItem('lastSync', Date.now().toString());
+    updateSync();
+  }
+}, 60000);
+
+// INIT
+renderNav();
+renderHome();
+</script>
+</body>
