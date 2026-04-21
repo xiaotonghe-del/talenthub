@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Industry {
+  id        String   @id
+  label     String
+  desc      String
+  num       String
+  icon      String   @default("")
+  criteria  String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profiles  Profile[]
+}
+
+model UniversalCriteria {
+  id        Int      @id @default(autoincrement())
+  rule      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Profile {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  name           String
+  title          String
+  company        String
+  industryId     String
+  industry       Industry  @relation(fields: [industryId], references: [id])
+  bio            String
+  linkedin       String?
+  twitter        String?
+  website        String?
+  education      Json      @default("[]")
+  experience     Json      @default("[]")
+
+  verified       Boolean   @default(true)
+  verifyReason   String?
+  lastVerified   DateTime  @default(now())
+  lastSynced     DateTime  @default(now())
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  newsItems      NewsItem[]
+
+  @@index([industryId])
+  @@index([verified])
+}
+
+model NewsItem {
+  id          String   @id @default(cuid())
+  profileId   String
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title       String
+  url         String
+  source      String
+  snippet     String?
+  publishedAt DateTime
+  createdAt   DateTime @default(now())
+
+  @@unique([profileId, url])
+  @@index([publishedAt])
+}
+
+model SyncLog {
+  id           String   @id @default(cuid())
+  runAt        DateTime @default(now())
+  trigger      String
+  durationMs   Int
+  processed    Int      @default(0)
+  updated      Int      @default(0)
+  unverified   Int      @default(0)
+  newsAdded    Int      @default(0)
+  errors       String?
+  status       String
+}
