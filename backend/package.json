@@ -8,8 +8,7 @@
       "start": "node server.js",
       "dev": "node --watch server.js",
       "db:push": "prisma db push",
-      "db:seed": "node seed.js",
-      "postinstall": "prisma generate"
+      "db:seed": "node seed.js"
     },
     "dependencies": {
       "@prisma/client": "^5.22.0",
