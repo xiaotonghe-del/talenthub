@@ -1,6 +1,8 @@
 [build]
 builder = "NIXPACKS"
+buildCommand = "npm install && npx prisma generate && npx prisma db push --accept-data-loss"
 
 [deploy]
+startCommand = "node server.js"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
