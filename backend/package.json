@@ -4,8 +4,8 @@
     "description": "TalentHub backend with criteria filtering and LLM-driven profile sync",
     "main": "server.js",
     "type": "module",
-  "scripts": {
-    "start": "npx prisma generate && npx prisma db push --accept-data-loss && node server.js",
+"scripts": {
+    "start": "node server.js",
     "dev": "node --watch server.js",
     "db:push": "prisma db push",
     "db:seed": "node seed.js"
