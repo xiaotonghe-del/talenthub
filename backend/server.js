@@ -340,10 +340,18 @@ app.post('/api/profiles', async (req, res) => {
 });
 
 app.delete('/api/profiles/:slug', async (req, res) => {
+  // 需要 CRON_SECRET 作为管理员密码
+  const auth = req.headers.authorization;
+  if (auth !== `Bearer ${CRON_SECRET}`) {
+    return res.status(401).json({ error: 'Unauthorized — admin password required' });
+  }
   try {
     await prisma.profile.delete({ where: { slug: req.params.slug } });
+    console.log(`[Admin] Deleted profile: ${req.params.slug}`);
     res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.post('/api/refresh', async (req, res) => {
