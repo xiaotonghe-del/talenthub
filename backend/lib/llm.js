@@ -124,8 +124,7 @@ Return ONLY valid JSON:
   }
 }
 /**
- * 让 AI 根据 criteria 发现新的候选人
- * 返回 5 个符合标准且不在排除列表里的新 profile
+ * 让 AI 根据 criteria 发现新的候选人（严格反幻觉版）
  */
 export async function discoverProfiles({ industry, industryCriteria, universalCriteria, existingNames, count = 5 }) {
   if (!openai) {
@@ -133,7 +132,9 @@ export async function discoverProfiles({ industry, industryCriteria, universalCr
     return [];
   }
 
-  const prompt = `You are a talent researcher. Discover ${count} REAL, verifiable people who currently qualify for a curated talent directory in the "${industry}" category.
+  const prompt = `You are a talent researcher. Your ONLY task is to find REAL, WELL-KNOWN, VERIFIABLE people for a curated AI industry talent directory.
+
+TASK: Suggest up to ${count} REAL people in the "${industry}" category.
 
 UNIVERSAL CRITERIA (must meet ALL):
 ${universalCriteria.map((c, i) => `${i + 1}. ${c}`).join('\n')}
@@ -141,57 +142,97 @@ ${universalCriteria.map((c, i) => `${i + 1}. ${c}`).join('\n')}
 INDUSTRY CRITERIA (must meet AT LEAST ONE):
 ${industryCriteria.map((c, i) => `${i + 1}. ${c}`).join('\n')}
 
-EXCLUDE these people (already in database):
+ALREADY IN DATABASE (DO NOT SUGGEST THESE):
 ${existingNames.length ? existingNames.join(', ') : '(none)'}
 
-Requirements:
-- All people MUST be REAL, currently active professionals
-- Use only publicly known information
-- Return EXACTLY ${count} unique new people (different from excluded list)
-- Each must meet universal criteria AND at least one industry criterion
+CRITICAL RULES — YOU MUST FOLLOW:
 
-Return ONLY valid JSON (no markdown):
+1. ONLY suggest people you are 100% SURE exist and whose current role you can verify from public sources (news, LinkedIn, company websites as of 2024-2025).
+
+2. If you are NOT SURE about a specific person's current company or role, DO NOT include them. It is FAR better to return FEWER people than to make up details.
+
+3. EVERY person MUST have a REAL LinkedIn profile URL. If you don't know their exact LinkedIn URL, DO NOT include them.
+
+4. DO NOT invent or guess:
+   - Company names
+   - Job titles
+   - LinkedIn URLs
+   - Education details
+   - Twitter handles
+
+5. If you cannot find ${count} people you are SURE about, return fewer (even just 1-2 is better than fake data).
+
+6. Prefer well-known industry leaders over obscure figures. The goal is quality, not quantity.
+
+7. It is acceptable and encouraged to return an EMPTY array if you cannot confidently identify new people.
+
+Return ONLY valid JSON (no markdown, no commentary):
 {
   "profiles": [
     {
-      "name": "Full Name",
-      "title": "Their current role",
-      "company": "Their current company",
-      "bio": "2-3 sentence bio explaining why they qualify",
-      "linkedin": "https://www.linkedin.com/in/their-handle/ or empty string",
-      "twitter": "https://x.com/their-handle or empty string",
-      "website": "empty string or official URL",
-      "education": [{"school": "University Name", "degree": "Degree name"}],
-      "experience": [{"role": "Current role", "company": "Current company", "current": true}]
+      "name": "Full Real Name",
+      "title": "Their verified current role",
+      "company": "Their verified current company",
+      "bio": "Factual 2-3 sentence bio with only verifiable facts",
+      "linkedin": "https://www.linkedin.com/in/their-real-handle/",
+      "twitter": "https://x.com/their-real-handle or empty string if unsure",
+      "website": "empty string or verified official URL",
+      "education": [{"school": "Verified University Name", "degree": "Verified degree"}],
+      "experience": [{"role": "Current role", "company": "Current company", "current": true}],
+      "confidence": "high | medium | low"
     }
   ]
-}`;
+}
+
+Set "confidence": "high" only if you are 100% certain of name + current company + LinkedIn.
+If confidence would be "low", DO NOT include that person.`;
 
   try {
     const response = await openai.chat.completions.create({
       model: MODEL,
       response_format: { type: 'json_object' },
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0.2,
       max_tokens: 2500,
     });
 
     const raw = response.choices?.[0]?.message?.content || '';
     const parsed = safeParseJSON(raw, { profiles: [] });
-    const profiles = Array.isArray(parsed.profiles) ? parsed.profiles : [];
+    let profiles = Array.isArray(parsed.profiles) ? parsed.profiles : [];
 
-    // 规范化每个 profile
+    // 过滤层 1: 必须有 LinkedIn
+    profiles = profiles.filter(p => {
+      const hasLinkedIn = p.linkedin && typeof p.linkedin === 'string' && p.linkedin.includes('linkedin.com/in/');
+      if (!hasLinkedIn) {
+        console.warn(`[Discover] Rejected ${p.name}: no valid LinkedIn`);
+      }
+      return hasLinkedIn;
+    });
+
+    // 过滤层 2: 必须 confidence = high
+    profiles = profiles.filter(p => {
+      const isHigh = !p.confidence || p.confidence === 'high';
+      if (!isHigh) {
+        console.warn(`[Discover] Rejected ${p.name}: confidence=${p.confidence}`);
+      }
+      return isHigh;
+    });
+
+    // 过滤层 3: 必须有基本字段 + bio 长度
+    profiles = profiles.filter(p => p.name && p.title && p.company && p.bio && p.bio.length >= 30);
+
+    // 规范化
     return profiles.slice(0, count).map(p => ({
-      name: String(p.name || '').trim(),
-      title: String(p.title || '').trim(),
-      company: String(p.company || '').trim(),
-      bio: String(p.bio || '').trim(),
-      linkedin: p.linkedin || '',
+      name: String(p.name).trim(),
+      title: String(p.title).trim(),
+      company: String(p.company).trim(),
+      bio: String(p.bio).trim(),
+      linkedin: p.linkedin,
       twitter: p.twitter || '',
       website: p.website || '',
       education: Array.isArray(p.education) ? p.education : [],
       experience: Array.isArray(p.experience) ? p.experience : [],
-    })).filter(p => p.name && p.title && p.company);
+    }));
   } catch (e) {
     console.error(`[LLM] discoverProfiles (${industry}) error:`, e.message);
     return [];
