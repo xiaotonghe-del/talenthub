@@ -12,37 +12,51 @@ function isValidProfile(p) {
     return true;
   }
   
-  function sanitize(p) {
-    return {
-      slug: String(p.slug).trim(),
-      name: String(p.name).trim(),
-      title: String(p.title || '').trim(),
-      company: String(p.company || '').trim(),
-      industry: String(p.industryId),
-      bio: String(p.bio || '').trim(),
-      linkedin: p.linkedin || '',
-      twitter: p.twitter || '',
-      website: p.website || '',
-      education: Array.isArray(p.education) ? p.education : [],
-      experience: Array.isArray(p.experience) ? p.experience : [],
-      verified: Boolean(p.verified),
-      lastSynced: p.lastSynced ? new Date(p.lastSynced).toISOString() : new Date().toISOString(),
-    };
-  }
+function sanitize(p) {
+  return {
+    slug: String(p.slug).trim(),
+    name: String(p.name).trim(),
+    title: String(p.title || '').trim(),
+    company: String(p.company || '').trim(),
+    industry: String(p.industryId),
+    bio: String(p.bio || '').trim(),
+    linkedin: p.linkedin || '',
+    twitter: p.twitter || '',
+    website: p.website || '',
+    education: Array.isArray(p.education) ? p.education : [],
+    experience: Array.isArray(p.experience) ? p.experience : [],
+    verified: Boolean(p.verified),
+    verifyReason: p.verifyReason || '',
+    lastSynced: p.lastSynced ? new Date(p.lastSynced).toISOString() : new Date().toISOString(),
+  };
+}
   
-  function passesBusinessRules(p, activeIndustryIds) {
-    if (!p.verified) return { pass: false, reason: 'Not verified by AI' };
-    if (!p.title) return { pass: false, reason: 'Missing title' };
-    if (!p.company) return { pass: false, reason: 'Missing company' };
-    if (!p.linkedin && !p.twitter && !p.website) {
-      return { pass: false, reason: 'No public presence link' };
-    }
-    if (!p.bio || p.bio.length < 20) return { pass: false, reason: 'Bio too short' };
-    if (!activeIndustryIds.includes(p.industry)) {
-      return { pass: false, reason: `Industry ${p.industry} not active` };
-    }
-    return { pass: true };
+function passesBusinessRules(p, activeIndustryIds) {
+  if (!p.verified) return { pass: false, reason: 'Not verified by AI' };
+  if (!p.title) return { pass: false, reason: 'Missing title' };
+  if (!p.company) return { pass: false, reason: 'Missing company' };
+
+  // 强化：LinkedIn 必须合法，避免 AI 幻觉的 profile
+  const hasValidLinkedIn = p.linkedin && p.linkedin.includes('linkedin.com/in/');
+  const hasOtherLink = p.twitter || p.website;
+
+  if (!hasValidLinkedIn && !hasOtherLink) {
+    return { pass: false, reason: 'No public presence link' };
   }
+
+  // 如果是 AI 发现的（verifyReason 包含 "AI-discovered"），强制要求 LinkedIn
+  if (p.verifyReason && p.verifyReason.includes('AI-discovered') && !hasValidLinkedIn) {
+    return { pass: false, reason: 'AI-discovered profile must have LinkedIn' };
+  }
+
+  if (!p.bio || p.bio.length < 20) return { pass: false, reason: 'Bio too short' };
+
+  if (!activeIndustryIds.includes(p.industry)) {
+    return { pass: false, reason: `Industry ${p.industry} not active` };
+  }
+
+  return { pass: true };
+}
   
   export function filterByCriteria(rawProfiles, activeIndustryIds, opts = {}) {
     const accepted = [];
