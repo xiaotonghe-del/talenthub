@@ -133,64 +133,58 @@ const DC = {
   }
 };
 
-const P = [
-  { slug: 'josh-bersin', name: 'Josh Bersin', title: 'Global Industry Analyst', company: 'The Josh Bersin Company', industry: 'HR',
-    bio: 'Globally recognized HR industry analyst. Founder of Bersin & Associates (acquired by Deloitte) and The Josh Bersin Company.',
-    linkedin: 'https://www.linkedin.com/in/bersin/', twitter: 'https://x.com/Josh_Bersin',
-    education: [{ school: 'Stanford University', degree: 'MS, Engineering Management' }, { school: 'Cornell University', degree: 'BS, Engineering' }],
-    experience: [{ role: 'Founder & CEO', company: 'The Josh Bersin Company', current: true }, { role: 'Principal, Bersin', company: 'Deloitte Consulting' }] },
-  { slug: 'ashutosh-garg', name: 'Ashutosh Garg', title: 'Co-Founder & CEO', company: 'Eightfold AI', industry: 'HR',
-    bio: 'Co-founder and CEO of Eightfold AI, a talent intelligence platform using deep learning.',
-    linkedin: 'https://www.linkedin.com/in/ashutoshgarg-eightfold/',
-    education: [{ school: 'University of Illinois Urbana-Champaign', degree: 'PhD, Computer Science' }, { school: 'IIT Delhi', degree: 'B.Tech, Computer Science' }],
-    experience: [{ role: 'Co-Founder & CEO', company: 'Eightfold AI', current: true }, { role: 'Research Scientist', company: 'Google' }] },
-  { slug: 'harrison-chase', name: 'Harrison Chase', title: 'Co-Founder & CEO', company: 'LangChain', industry: 'AI_AGENTS',
-    bio: 'Co-founder and CEO of LangChain, the open-source framework for building applications with large language models.',
-    linkedin: 'https://www.linkedin.com/in/harrison-chase-961287118/', twitter: 'https://x.com/hwchase17',
-    education: [{ school: 'Harvard University', degree: 'BA, Statistics & Computer Science' }],
-    experience: [{ role: 'Co-Founder & CEO', company: 'LangChain', current: true }, { role: 'ML Engineer', company: 'Robust Intelligence' }] },
-  { slug: 'andrew-ng', name: 'Andrew Ng', title: 'Founder', company: 'DeepLearning.AI', industry: 'AI_AGENTS',
-    bio: 'Founder of DeepLearning.AI, Landing AI, and AI Fund. Co-founder of Coursera. Adjunct Professor at Stanford.',
-    linkedin: 'https://www.linkedin.com/in/andrewyng/', twitter: 'https://x.com/AndrewYNg',
-    education: [{ school: 'UC Berkeley', degree: 'PhD, Computer Science' }, { school: 'MIT', degree: 'MS, EECS' }, { school: 'Carnegie Mellon', degree: 'BS' }],
-    experience: [{ role: 'Founder', company: 'DeepLearning.AI', current: true }, { role: 'Founder & CEO', company: 'Landing AI', current: true }] },
-  { slug: 'scott-stephenson', name: 'Scott Stephenson', title: 'Co-Founder & CEO', company: 'Deepgram', industry: 'VOICE_AI',
-    bio: 'Co-founder and CEO of Deepgram, a leading speech-to-text and voice AI platform. Former particle physicist.',
-    linkedin: 'https://www.linkedin.com/in/scottstephenson/', twitter: 'https://x.com/ScottSteph',
-    education: [{ school: 'University of Michigan', degree: 'PhD, Particle Physics' }, { school: 'Case Western Reserve', degree: 'BS, Physics' }],
-    experience: [{ role: 'Co-Founder & CEO', company: 'Deepgram', current: true }] },
-  { slug: 'mati-staniszewski', name: 'Mati Staniszewski', title: 'Co-Founder & CEO', company: 'ElevenLabs', industry: 'VOICE_AI',
-    bio: 'Co-founder and CEO of ElevenLabs, a leader in AI voice synthesis and cloning.',
-    linkedin: 'https://www.linkedin.com/in/mati-staniszewski/', twitter: 'https://x.com/matistanis',
-    education: [{ school: 'Imperial College London', degree: 'Mathematics' }],
-    experience: [{ role: 'Co-Founder & CEO', company: 'ElevenLabs', current: true }, { role: 'Deployment Strategist', company: 'Palantir' }] },
-  { slug: 'sarah-guo', name: 'Sarah Guo', title: 'Founder & Managing Partner', company: 'Conviction', industry: 'VC',
-    bio: 'Founder of Conviction, AI-focused venture fund. Host of No Priors podcast. Previously General Partner at Greylock.',
-    linkedin: 'https://www.linkedin.com/in/sarahguo/', twitter: 'https://x.com/saranormous',
-    education: [{ school: 'University of Pennsylvania', degree: 'BS, Wharton & Engineering' }],
-    experience: [{ role: 'Founder & Managing Partner', company: 'Conviction', current: true }, { role: 'General Partner', company: 'Greylock Partners' }] },
-  { slug: 'vinod-khosla', name: 'Vinod Khosla', title: 'Founder', company: 'Khosla Ventures', industry: 'VC',
-    bio: 'Founder of Khosla Ventures. Co-founder of Sun Microsystems. Early major backer of OpenAI.',
-    linkedin: 'https://www.linkedin.com/in/vinodkhosla/', twitter: 'https://x.com/vkhosla',
-    education: [{ school: 'Stanford GSB', degree: 'MBA' }, { school: 'IIT Delhi', degree: 'B.Tech' }],
-    experience: [{ role: 'Founder', company: 'Khosla Ventures', current: true }, { role: 'Co-Founder', company: 'Sun Microsystems' }] },
-  { slug: 'fei-fei-li', name: 'Fei-Fei Li', title: 'Sequoia Professor', company: 'Stanford University', industry: 'UNIVERSITY',
-    bio: 'Sequoia Professor at Stanford and Co-Director of Stanford HAI. Creator of ImageNet. Co-founder of World Labs.',
-    linkedin: 'https://www.linkedin.com/in/fei-fei-li-4541247/', twitter: 'https://x.com/drfeifei',
-    education: [{ school: 'Caltech', degree: 'PhD, Electrical Engineering' }, { school: 'Princeton University', degree: 'BA, Physics' }],
-    experience: [{ role: 'Sequoia Professor', company: 'Stanford University', current: true }, { role: 'Co-Founder & CEO', company: 'World Labs', current: true }] },
-  { slug: 'yann-lecun', name: 'Yann LeCun', title: 'Chief AI Scientist', company: 'Meta · NYU', industry: 'UNIVERSITY',
-    bio: 'Chief AI Scientist at Meta and Silver Professor at NYU. 2018 Turing Award laureate. Inventor of convolutional neural networks.',
-    linkedin: 'https://www.linkedin.com/in/yann-lecun/', twitter: 'https://x.com/ylecun',
-    education: [{ school: 'Sorbonne Université', degree: 'PhD, Computer Science' }],
-    experience: [{ role: 'Chief AI Scientist', company: 'Meta', current: true }, { role: 'Silver Professor', company: 'NYU', current: true }] }
-];
+let P = [];
 
+const API_BASE = 'https://talenthub-production-edd2.up.railway.app';
+let STATE_IND = {};
+let STATE_CR = { universal: [], byIndustry: {} };
+
+async function loadFromBackend() {
+  try {
+    const [indRes, crRes, profRes] = await Promise.all([
+      fetch(API_BASE + '/api/industries').then(r => r.json()),
+      fetch(API_BASE + '/api/criteria').then(r => r.json()),
+      fetch(API_BASE + '/api/profiles').then(r => r.json()),
+    ]);
+    STATE_IND = indRes;
+    STATE_CR = crRes;
+    P.length = 0;
+    (profRes.profiles || []).forEach(p => P.push(p));
+    return true;
+  } catch (e) {
+    console.warn('Backend unreachable:', e.message);
+    return false;
+  }
+}
+
+async function saveIND(ind) {
+  STATE_IND = ind;
+  try {
+    for (const [id, data] of Object.entries(ind)) {
+      await fetch(API_BASE + '/api/industries/' + id, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+    }
+  } catch (e) { toast('Failed to save: ' + e.message); }
+}
+
+async function saveCR(c) {
+  STATE_CR = c;
+  try {
+    await fetch(API_BASE + '/api/criteria', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(c),
+    });
+  } catch (e) { toast('Failed to save: ' + e.message); }
+}
+
+
+function getIND() { return STATE_IND || {}; }
+function getCR() { return STATE_CR || { universal: [], byIndustry: {} }; }
 // STORAGE
-function getIND() { try { const s = localStorage.getItem('ind'); if (s) return JSON.parse(s); } catch(e){} return JSON.parse(JSON.stringify(DI)); }
-function saveIND(i) { localStorage.setItem('ind', JSON.stringify(i)); }
-function getCR() { try { const s = localStorage.getItem('cr'); if (s) return JSON.parse(s); } catch(e){} return JSON.parse(JSON.stringify(DC)); }
-function saveCR(c) { localStorage.setItem('cr', JSON.stringify(c)); }
 function getStars() { try { return JSON.parse(localStorage.getItem('stars') || '[]'); } catch(e) { return []; } }
 function saveStars(a) { localStorage.setItem('stars', JSON.stringify(a)); updateHub(); }
 function isStar(s) { return getStars().includes(s); }
@@ -233,15 +227,24 @@ function updateSync() {
 }
 setInterval(updateSync, 30000);
 
-function refresh() {
+async function refresh() {
   const s = document.getElementById('us');
   if (s) s.textContent = 'Syncing';
-  setTimeout(() => {
-    localStorage.setItem('lastSync', Date.now().toString());
+  try {
+    await fetch(API_BASE + '/api/refresh', { method: 'POST' });
+    toast('Sync started — updating profiles...');
+    setTimeout(async () => {
+      await loadFromBackend();
+      if (s) s.textContent = 'Auto-sync';
+      localStorage.setItem('lastSync', Date.now().toString());
+      updateSync();
+      if (window.cv) window.cv();
+      toast('Profiles refreshed');
+    }, 5000);
+  } catch (e) {
     if (s) s.textContent = 'Auto-sync';
-    updateSync();
-    toast('Data refreshed');
-  }, 1200);
+    toast('Refresh failed');
+  }
 }
 
 // NAV (changed "Hub" to "My Hub")
@@ -648,7 +651,9 @@ setInterval(() => {
 }, 60000);
 
 // INIT
-renderNav();
-renderHome();
+loadFromBackend().then(() => {
+  renderNav();
+  renderHome();
+});
 </script>
 </body>
