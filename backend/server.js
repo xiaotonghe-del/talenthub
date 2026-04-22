@@ -4,7 +4,7 @@ import cron from 'node-cron';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import { filterByCriteria, filterOne } from './lib/criteria.js';
-import { searchNews, verifyProfile } from './lib/llm.js';
+import { searchNews, verifyProfile, discoverProfiles } from './lib/llm.js';
 
 dotenv.config();
 
@@ -35,6 +35,63 @@ async function runSync(trigger = 'manual') {
     const universalRows = await prisma.universalCriteria.findMany({ orderBy: { order: 'asc' } });
     const universal = universalRows.map(r => r.rule);
     const profiles = await prisma.profile.findMany({ include: { industry: true } });
+    // ========== 发现新 profile ==========
+    try {
+      const industries = await prisma.industry.findMany();
+      const existingProfiles = await prisma.profile.findMany({ select: { name: true, industryId: true } });
+      const namesByIndustry = {};
+      existingProfiles.forEach(p => {
+        if (!namesByIndustry[p.industryId]) namesByIndustry[p.industryId] = [];
+        namesByIndustry[p.industryId].push(p.name);
+      });
+
+      for (const industry of industries) {
+        try {
+          console.log(`[Discover] Finding new profiles for ${industry.label}...`);
+          const newProfiles = await discoverProfiles({
+            industry: industry.label,
+            industryCriteria: industry.criteria || [],
+            universalCriteria: universal,
+            existingNames: namesByIndustry[industry.id] || [],
+            count: 5,
+          });
+
+          for (const np of newProfiles) {
+            const slug = np.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString(36).slice(-4);
+            try {
+              await prisma.profile.create({
+                data: {
+                  slug,
+                  name: np.name,
+                  title: np.title,
+                  company: np.company,
+                  industryId: industry.id,
+                  bio: np.bio,
+                  linkedin: np.linkedin || null,
+                  twitter: np.twitter || null,
+                  website: np.website || null,
+                  education: np.education,
+                  experience: np.experience,
+                  verified: true,
+                  verifyReason: `AI-discovered under ${industry.label} criteria`,
+                },
+              });
+              console.log(`[Discover] + Added ${np.name} (${industry.label})`);
+              log.newsAdded++;
+            } catch (e) {
+              console.warn(`[Discover] Skip ${np.name}: ${e.message}`);
+            }
+          }
+        } catch (e) {
+          console.error(`[Discover] ${industry.label} failed:`, e.message);
+          log.errors.push(`Discover ${industry.label}: ${e.message}`);
+        }
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    } catch (e) {
+      console.error('[Discover] Fatal:', e.message);
+    }
+    // ========== 发现结束 ==========
     for (const profile of profiles) {
       try {
         log.processed++;
