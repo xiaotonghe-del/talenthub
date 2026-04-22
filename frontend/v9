@@ -157,6 +157,30 @@ async function loadFromBackend() {
   }
 }
 
+async function deleteProfile(slug, name) {
+  const password = prompt(`⚠️ Delete "${name}"?\n\nThis cannot be undone.\n\nEnter admin password:`);
+  if (!password) return;
+  
+  try {
+    const res = await fetch(API_BASE + '/api/profiles/' + slug, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + password },
+    });
+    
+    if (res.ok) {
+      toast(`✓ Deleted "${name}"`);
+      await loadFromBackend();
+      go('home');  // 回到首页
+    } else if (res.status === 401) {
+      toast('✕ Wrong password');
+    } else {
+      toast('✕ Delete failed');
+    }
+  } catch (e) {
+    toast('✕ Error: ' + e.message);
+  }
+}
+
 async function saveIND(ind) {
   STATE_IND = ind;
   try {
@@ -531,6 +555,9 @@ function renderPerson(slug) {
                   <svg class="h-3 w-3" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 .587l3.668 7.568L24 9.75l-6 5.847L19.336 24 12 19.897 4.664 24 6 15.597 0 9.75l8.332-1.595z"/></svg>
                   ${st ? 'Pinned' : 'Pin'}
                 </button>
+                <button onclick="deleteProfile('${p.slug}', '${esc(p.name).replace(/'/g, "\\'")}')" class="btn" style="border-color: rgba(239,68,68,0.3); color: rgba(239,68,68,0.8);">
+  Delete
+</button>
               </div>
             </div>
           </div>
